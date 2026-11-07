@@ -15,7 +15,7 @@ android {
   defaultConfig {
     applicationId = "com.aistudio.paksignal.xrtkqp"
     minSdk = 26
-    targetSdk = 36
+    targetSdk = 35
     versionCode = 1
     versionName = "1.0"
 
