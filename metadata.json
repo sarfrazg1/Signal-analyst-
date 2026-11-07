@@ -1,0 +1,6 @@
+{
+  "name": "Pak Signal Analyzer AI",
+  "description": "Real-time cellular signal analyzer for Pakistani telecom networks (Jazz, Zong, Ufone, Telenor, SCOM) with authentic dBm, LTE RSRP/RSRQ/SINR metrics, dual SIM monitoring, Urdu RTL support, and Room offline diagnostics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
