@@ -15,8 +15,8 @@ class AppPreferences(context: Context) {
     val languageFlow: StateFlow<AppLanguage> = _languageFlow.asStateFlow()
 
     private fun loadLanguage(): AppLanguage {
-        val code = prefs.getString(KEY_LANGUAGE, AppLanguage.ENGLISH.code)
-        return AppLanguage.values().firstOrNull { it.code == code } ?: AppLanguage.ENGLISH
+        val code = prefs.getString(KEY_LANGUAGE, AppLanguage.URDU.code)
+        return AppLanguage.values().firstOrNull { it.code == code } ?: AppLanguage.URDU
     }
 
     fun setLanguage(language: AppLanguage) {

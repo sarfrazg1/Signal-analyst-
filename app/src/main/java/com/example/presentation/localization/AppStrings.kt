@@ -404,4 +404,132 @@ object AppStrings {
         AppLanguage.ENGLISH -> "Performance Trends"
         AppLanguage.URDU -> "کارکردگی کا رجحان"
     }
+
+    // ============================================
+    // Simple Dashboard & Quality Strings
+    // ============================================
+
+    fun callQualityTitle(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Call Quality"
+        AppLanguage.URDU -> "کال کی کوالٹی"
+    }
+
+    fun callQualitySubtitle(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Voice & Audio Signal Status"
+        AppLanguage.URDU -> "آواز اور نیٹ ورک کنکشن"
+    }
+
+    fun internetQualityTitle(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Internet Quality"
+        AppLanguage.URDU -> "انٹرنیٹ کی کوالٹی"
+    }
+
+    fun internetQualitySubtitle(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Data & Browsing Status"
+        AppLanguage.URDU -> "ڈیٹا اور براؤزنگ کا معیار"
+    }
+
+    fun speedNotTestedNotice(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Internet speed has not been tested yet"
+        AppLanguage.URDU -> "ابھی انٹرنیٹ کی رفتار چیک نہیں ہوئی"
+    }
+
+    fun runSpeedTestNow(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Run Speed Test"
+        AppLanguage.URDU -> "اسپیڈ ٹیسٹ کریں"
+    }
+
+    fun infoUnavailable(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Information unavailable"
+        AppLanguage.URDU -> "معلومات دستیاب نہیں"
+    }
+
+    fun expandTechnicalDetails(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "More Technical Information"
+        AppLanguage.URDU -> "مزید تکنیکی معلومات"
+    }
+
+    fun collapseTechnicalDetails(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Hide Technical Information"
+        AppLanguage.URDU -> "تکنیکی معلومات چھپائیں"
+    }
+
+    fun technicalDetailsSubtitle(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Radio spectrum, RSRP, dBm & tower metrics"
+        AppLanguage.URDU -> "ریڈیو اسپیکٹرم، سگنل پاور اور ٹاور تفصیلات"
+    }
+
+    fun simpleDashboardSubtitle(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Simple and clear mobile network condition for everyone"
+        AppLanguage.URDU -> "عام صارفین کے لیے موبائل نیٹ ورک کی آسان معلومات"
+    }
+
+    // ============================================
+    // About Us Page Strings
+    // ============================================
+
+    fun tabAbout(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "About Us"
+        AppLanguage.URDU -> "ہمارے بارے میں"
+    }
+
+    fun aboutTitle(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "About Us"
+        AppLanguage.URDU -> "ہمارے بارے میں"
+    }
+
+    fun createdByLabel(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Created By"
+        AppLanguage.URDU -> "ایپ تیار کنندہ"
+    }
+
+    fun creatorName(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Rao Muhammad Sarfraz"
+        AppLanguage.URDU -> "راؤ محمد سرفراز"
+    }
+
+    fun designationLabel(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "App Creator & Developer"
+        AppLanguage.URDU -> "ایپ تخلیق کار اور ڈویلپر"
+    }
+
+    fun whatsappLabel(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "WhatsApp Number"
+        AppLanguage.URDU -> "واٹس ایپ نمبر"
+    }
+
+    fun contactViaWhatsApp(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Chat on WhatsApp"
+        AppLanguage.URDU -> "واٹس ایپ پر رابطہ کریں"
+    }
+
+    fun visitFacebookPage(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Visit Facebook Page"
+        AppLanguage.URDU -> "فیس بک پیج وزٹ کریں"
+    }
+
+    fun copyNumber(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Copy Number"
+        AppLanguage.URDU -> "نمبر کاپی کریں"
+    }
+
+    fun numberCopied(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "WhatsApp number copied to clipboard!"
+        AppLanguage.URDU -> "واٹس ایپ نمبر کلپ بورڈ پر کاپی ہو گیا!"
+    }
+
+    fun appVersionLabel(lang: AppLanguage, version: String) = when (lang) {
+        AppLanguage.ENGLISH -> "Version: $version"
+        AppLanguage.URDU -> "ورژن: $version"
+    }
+
+    fun copyrightLabel(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "© Rao Muhammad Sarfraz. All Rights Reserved."
+        AppLanguage.URDU -> "© راؤ محمد سرفراز۔ جملہ حقوق محفوظ ہیں۔"
+    }
+
+    fun aboutAppMission(lang: AppLanguage) = when (lang) {
+        AppLanguage.ENGLISH -> "Pakistan Signal Analyzer AI is built to give every Pakistani mobile user transparent, 100% genuine insight into cellular coverage and internet quality across Jazz, Zong, Ufone, Telenor, and SCOM."
+        AppLanguage.URDU -> "پاکستان سگنل اینالائزر AI پاکستان کے تمام صارفین کے لیے ایک دیسی اور آسان موبائل اینالائزر ہے، جو جاز، زونگ، یوفون، ٹیلی نار اور ایس کام کے حقیقی سگنل اور ڈیٹا رفتار کا شفاف جائزہ پیش کرتا ہے۔"
+    }
 }

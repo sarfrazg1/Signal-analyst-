@@ -72,15 +72,19 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.model.AppLanguage
+import com.example.domain.model.SimpleQualityEvaluator
+import com.example.presentation.about.AboutUsScreen
 import com.example.presentation.comparison.ComparisonScreen
 import com.example.presentation.diagnostics.DiagnosticsScreen
 import com.example.presentation.dashboard.components.LteMetricsCard
 import com.example.presentation.dashboard.components.OperatorBadge
 import com.example.presentation.dashboard.components.SavedDiagnosticsBottomSheet
 import com.example.presentation.dashboard.components.SignalMeterCard
+import com.example.presentation.dashboard.components.SimpleQualityCards
 import com.example.presentation.dashboard.components.SimSelectorTab
 import com.example.presentation.dashboard.components.StatusBanner
 import com.example.presentation.localization.AppStrings
@@ -158,7 +162,7 @@ fun DashboardScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(10.dp))
-                            Column {
+                                Column {
                                 Text(
                                     text = AppStrings.appTitle(uiState.currentLanguage),
                                     style = MaterialTheme.typography.titleMedium,
@@ -170,7 +174,8 @@ fun DashboardScreen(
                                         1 -> AppStrings.tabSpeed(uiState.currentLanguage)
                                         2 -> AppStrings.tabDiagnostics(uiState.currentLanguage)
                                         3 -> AppStrings.tabCompare(uiState.currentLanguage)
-                                        else -> AppStrings.liveDetection(uiState.currentLanguage)
+                                        4 -> AppStrings.tabAbout(uiState.currentLanguage)
+                                        else -> AppStrings.simpleDashboardSubtitle(uiState.currentLanguage)
                                     },
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.primary,
@@ -181,13 +186,25 @@ fun DashboardScreen(
                         }
                     },
                     actions = {
+                        // About Us button in Top Bar
+                        IconButton(
+                            onClick = { viewModel.setCurrentTab(4) },
+                            modifier = Modifier.testTag("about_us_top_button")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = AppStrings.tabAbout(uiState.currentLanguage),
+                                tint = if (uiState.currentTab == 4) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
                         // Language switcher (EN / اردو)
                         LanguageTogglePill(
                             currentLanguage = uiState.currentLanguage,
                             onLanguageChanged = { viewModel.setLanguage(it) }
                         )
 
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
 
                         // Refresh button with spin animation
                         val rotation = if (uiState.isScanning) {
@@ -273,6 +290,18 @@ fun DashboardScreen(
                         ),
                         modifier = Modifier.testTag("nav_tab_compare")
                     )
+
+                    NavigationBarItem(
+                        selected = uiState.currentTab == 4,
+                        onClick = { viewModel.setCurrentTab(4) },
+                        icon = { Icon(Icons.Default.Info, contentDescription = null) },
+                        label = { Text(AppStrings.tabAbout(uiState.currentLanguage)) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                        ),
+                        modifier = Modifier.testTag("nav_tab_about")
+                    )
                 }
             }
         ) { paddingValues ->
@@ -283,13 +312,14 @@ fun DashboardScreen(
             ) {
                 when (uiState.currentTab) {
                     0 -> {
-                        // Phase 1 Real-time Cellular Signal Meter
+                        // Phase 1 Simple Real-time Dashboard for Everyone
                         SignalTabContent(
                             uiState = uiState,
                             onRequestPermissions = { requestAppPermissions() },
                             onSelectSimSlot = { viewModel.selectSimSlot(it) },
                             onRecordSnapshot = { reading -> viewModel.recordSnapshot(reading) },
-                            onOpenHistory = { viewModel.toggleHistorySheet(true) }
+                            onOpenHistory = { viewModel.toggleHistorySheet(true) },
+                            onNavigateToSpeedTest = { viewModel.setCurrentTab(1) }
                         )
                     }
                     1 -> {
@@ -322,6 +352,13 @@ fun DashboardScreen(
                             onClearAllTests = { viewModel.clearAllSpeedTests() }
                         )
                     }
+                    4 -> {
+                        // Part 2 About Us Section
+                        AboutUsScreen(
+                            language = uiState.currentLanguage,
+                            onShowMessage = { viewModel.showMessage(it) }
+                        )
+                    }
                 }
             }
 
@@ -346,7 +383,8 @@ private fun SignalTabContent(
     onRequestPermissions: () -> Unit,
     onSelectSimSlot: (Int) -> Unit,
     onRecordSnapshot: (com.example.domain.model.SignalReading) -> Unit,
-    onOpenHistory: () -> Unit
+    onOpenHistory: () -> Unit,
+    onNavigateToSpeedTest: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -388,16 +426,30 @@ private fun SignalTabContent(
                 language = uiState.currentLanguage
             )
 
-            // Primary Signal Level & Quality Meter
-            SignalMeterCard(
-                reading = uiState.currentReading,
-                language = uiState.currentLanguage
-            )
+            // Evaluate Call Quality & Internet Quality for ordinary users
+            val callQuality = remember(uiState.currentReading, uiState.telephonyStatus) {
+                SimpleQualityEvaluator.evaluateCallQuality(
+                    uiState.currentReading,
+                    uiState.telephonyStatus
+                )
+            }
+            val latestSpeed = uiState.speedTestHistory.firstOrNull()
+            val internetQuality = remember(uiState.currentReading, uiState.telephonyStatus, latestSpeed) {
+                SimpleQualityEvaluator.evaluateInternetQuality(
+                    uiState.currentReading,
+                    uiState.telephonyStatus,
+                    latestSpeed
+                )
+            }
 
-            // LTE Advanced Radio Parameters (RSRP, RSRQ, SINR, PCI, Cell ID, TAC)
-            LteMetricsCard(
+            // Main Two Cards (Call Quality & Internet Quality) + Expandable Technical Section
+            SimpleQualityCards(
+                callQuality = callQuality,
+                internetQuality = internetQuality,
                 reading = uiState.currentReading,
-                language = uiState.currentLanguage
+                latestSpeedTest = latestSpeed,
+                language = uiState.currentLanguage,
+                onNavigateToSpeedTest = onNavigateToSpeedTest
             )
 
             // Action Buttons Row: Save Snapshot & Saved Diagnostics History

@@ -242,6 +242,10 @@ class DashboardViewModel(
         _selectedFilterOperator.value = brand
     }
 
+    fun showMessage(message: String) {
+        _notificationMessage.value = message
+    }
+
     fun exportCsvReport(onFileReady: (File) -> Unit) {
         viewModelScope.launch {
             _isExporting.value = true

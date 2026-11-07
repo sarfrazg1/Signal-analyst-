@@ -10,8 +10,8 @@ import com.example.domain.model.SpeedTestRecord
 import com.example.domain.model.TelephonyStatus
 
 data class DashboardUiState(
-    val currentLanguage: AppLanguage = AppLanguage.ENGLISH,
-    val currentTab: Int = 0, // 0: Signal, 1: Speed Test, 2: Compare
+    val currentLanguage: AppLanguage = AppLanguage.URDU,
+    val currentTab: Int = 0, // 0: Signal, 1: Speed Test, 2: Diagnostics, 3: Compare, 4: About Us
     val selectedSimSlot: Int = 0,
     val simSlots: List<SimSlotInfo> = emptyList(),
     val currentReading: SignalReading? = null,

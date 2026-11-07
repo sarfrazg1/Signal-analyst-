@@ -230,4 +230,140 @@ class ExampleUnitTest {
         assertEquals(DiagnosticCategory.HARDWARE_OR_SIM, report.category)
         assertEquals(DiagnosticSeverity.CRITICAL, report.severity)
     }
+
+    @Test
+    fun verify_simple_call_quality_evaluator() {
+        val strongSignal = SignalReading(
+            operator = PakistaniOperator.JAZZ,
+            operatorName = "Jazz",
+            mcc = "410",
+            mnc = "01",
+            networkGeneration = "4G LTE",
+            networkTypeDetails = "LTE",
+            rawDbm = -82,
+            lteRsrp = -85,
+            lteRsrq = -9,
+            lteSinr = 15.0,
+            lteCqi = 10,
+            lteTimingAdvance = 1,
+            cellId = 12345L,
+            pci = 100,
+            tac = 200,
+            earfcn = 1800,
+            quality = SignalQuality.EXCELLENT,
+            simSlotIndex = 0,
+            subscriptionId = 1,
+            isRegistered = true,
+            isRoaming = false
+        )
+
+        // Strong signal -> Best
+        val bestCall = com.example.domain.model.SimpleQualityEvaluator.evaluateCallQuality(strongSignal, TelephonyStatus.NORMAL)
+        assertEquals(com.example.domain.model.SimpleQualityLevel.BEST, bestCall.level)
+        assertEquals("بہترین", bestCall.urduLabel)
+        assertEquals("کال کے لیے بہترین سگنل — آرام سے بات ہو سکتی ہے۔", bestCall.urduExplanation)
+
+        // Moderate signal -> Normal
+        val normalSignal = strongSignal.copy(rawDbm = -98, lteRsrp = -98)
+        val normalCall = com.example.domain.model.SimpleQualityEvaluator.evaluateCallQuality(normalSignal, TelephonyStatus.NORMAL)
+        assertEquals(com.example.domain.model.SimpleQualityLevel.NORMAL, normalCall.level)
+        assertEquals("نارمل", normalCall.urduLabel)
+        assertEquals("کال کے لیے نارمل سگنل — عام طور پر بات ہو سکتی ہے۔", normalCall.urduExplanation)
+
+        // Weak signal -> Weak
+        val weakSignal = strongSignal.copy(rawDbm = -115, lteRsrp = -115)
+        val weakCall = com.example.domain.model.SimpleQualityEvaluator.evaluateCallQuality(weakSignal, TelephonyStatus.NORMAL)
+        assertEquals(com.example.domain.model.SimpleQualityLevel.WEAK, weakCall.level)
+        assertEquals("کمزور", weakCall.urduLabel)
+        assertEquals("کال کا سگنل کمزور — آواز کٹ سکتی ہے یا کال متاثر ہو سکتی ہے۔", weakCall.urduExplanation)
+
+        // Airplane mode / No SIM -> Unavailable
+        val unavailCall = com.example.domain.model.SimpleQualityEvaluator.evaluateCallQuality(null, TelephonyStatus.AIRPLANE_MODE)
+        assertEquals(com.example.domain.model.SimpleQualityLevel.UNAVAILABLE, unavailCall.level)
+        assertEquals("دستیاب نہیں", unavailCall.urduLabel)
+        assertEquals("کال سروس دستیاب نہیں۔", unavailCall.urduExplanation)
+    }
+
+    @Test
+    fun verify_simple_internet_quality_evaluator() {
+        val signal = SignalReading(
+            operator = PakistaniOperator.ZONG,
+            operatorName = "Zong",
+            mcc = "410",
+            mnc = "04",
+            networkGeneration = "4G LTE",
+            networkTypeDetails = "LTE",
+            rawDbm = -85,
+            lteRsrp = -85,
+            lteRsrq = -8,
+            lteSinr = 12.0,
+            lteCqi = 9,
+            lteTimingAdvance = 1,
+            cellId = 67890L,
+            pci = 120,
+            tac = 300,
+            earfcn = 1800,
+            quality = SignalQuality.GOOD,
+            simSlotIndex = 0,
+            subscriptionId = 1,
+            isRegistered = true,
+            isRoaming = false
+        )
+
+        val fastSpeed = SpeedTestRecord(
+            id = 1L,
+            timestamp = System.currentTimeMillis(),
+            operatorName = "Zong",
+            operatorBrand = "Zong 4G",
+            mccMnc = "410-04",
+            simSlotIndex = 0,
+            networkGeneration = "4G LTE",
+            downloadMbps = 25.4,
+            uploadMbps = 10.2,
+            pingMs = 28.0,
+            jitterMs = 3.0,
+            packetLossPercent = 0.0,
+            signalDbm = -85,
+            signalRsrp = -85,
+            isWifi = false
+        )
+
+        // Fast speed test -> Best
+        val bestNet = com.example.domain.model.SimpleQualityEvaluator.evaluateInternetQuality(signal, TelephonyStatus.NORMAL, fastSpeed)
+        assertEquals(com.example.domain.model.SimpleQualityLevel.BEST, bestNet.level)
+        assertEquals("بہترین", bestNet.urduLabel)
+        assertEquals("انٹرنیٹ بہترین ہے — ویڈیو، واٹس ایپ اور براؤزنگ اچھی چلیں گی۔", bestNet.urduExplanation)
+
+        // Moderate speed test -> Normal
+        val normalSpeed = fastSpeed.copy(downloadMbps = 4.2)
+        val normalNet = com.example.domain.model.SimpleQualityEvaluator.evaluateInternetQuality(signal, TelephonyStatus.NORMAL, normalSpeed)
+        assertEquals(com.example.domain.model.SimpleQualityLevel.NORMAL, normalNet.level)
+        assertEquals("نارمل", normalNet.urduLabel)
+        assertEquals("انٹرنیٹ نارمل ہے — واٹس ایپ اور عام براؤزنگ چل جائے گی۔", normalNet.urduExplanation)
+
+        // Slow speed test -> Weak
+        val weakSpeed = fastSpeed.copy(downloadMbps = 0.8)
+        val weakNet = com.example.domain.model.SimpleQualityEvaluator.evaluateInternetQuality(signal, TelephonyStatus.NORMAL, weakSpeed)
+        assertEquals(com.example.domain.model.SimpleQualityLevel.WEAK, weakNet.level)
+        assertEquals("کمزور", weakNet.urduLabel)
+        assertEquals("انٹرنیٹ کمزور ہے — ویڈیو رک سکتی ہے اور صفحات دیر سے کھلیں گے۔", weakNet.urduExplanation)
+
+        // No connection -> Unavailable
+        val unavailNet = com.example.domain.model.SimpleQualityEvaluator.evaluateInternetQuality(null, TelephonyStatus.NO_SIGNAL, null)
+        assertEquals(com.example.domain.model.SimpleQualityLevel.UNAVAILABLE, unavailNet.level)
+        assertEquals("دستیاب نہیں", unavailNet.urduLabel)
+        assertEquals("فی الحال انٹرنیٹ کنکشن دستیاب نہیں۔", unavailNet.urduExplanation)
+    }
+
+    @Test
+    fun verify_app_contact_config_integrity() {
+        assertEquals("Pakistan Signal Analyzer AI", com.example.domain.model.AppContactConfig.APP_NAME)
+        assertEquals("Rao Muhammad Sarfraz", com.example.domain.model.AppContactConfig.CREATOR_NAME)
+        assertEquals("App Creator & Developer", com.example.domain.model.AppContactConfig.DESIGNATION_EN)
+        assertEquals("+923360074976", com.example.domain.model.AppContactConfig.WHATSAPP_NUMBER)
+        assertEquals("https://wa.me/923360074976", com.example.domain.model.AppContactConfig.WHATSAPP_DIRECT_LINK)
+        assertEquals("https://www.facebook.com/share/1FfXAwkcm5/", com.example.domain.model.AppContactConfig.FACEBOOK_PAGE_LINK)
+        assertTrue(com.example.domain.model.AppContactConfig.COPYRIGHT_EN.contains("Rao Muhammad Sarfraz"))
+        assertTrue(com.example.domain.model.AppContactConfig.COPYRIGHT_URDU.contains("راؤ محمد سرفراز"))
+    }
 }
